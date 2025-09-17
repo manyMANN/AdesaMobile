@@ -24,9 +24,7 @@ class _LoginState extends State<Login> {
 
     if (email.isEmpty || password.isEmpty) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Debes ingresar correo y contraseña")),
-      );
+      showStyledSnackBar(context, "Debes ingresar correo y contraseña");
       return;
     }
 
@@ -77,6 +75,30 @@ class _LoginState extends State<Login> {
     }
   }
 
+  void showStyledSnackBar(
+    BuildContext context,
+    String message, {
+    Color bgColor = Colors.redAccent,
+    IconData icon = Icons.error,
+  }) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(icon, color: Colors.white),
+            SizedBox(width: 12),
+            Expanded(child: Text(message)),
+          ],
+        ),
+        backgroundColor: bgColor,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        duration: Duration(seconds: 3),
+        margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -86,76 +108,89 @@ class _LoginState extends State<Login> {
         child: SingleChildScrollView(
           padding: EdgeInsets.all(20),
           child: ConstrainedBox(
-            constraints: BoxConstraints(maxWidth: 350),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  "Bienvenido",
-                  style: TextStyle(
-                    fontSize: 35,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.blueAccent,
-                  ),
-                ),
-                SizedBox(height: 40),
-                TextField(
-                  controller: emailController,
-                  decoration: InputDecoration(
-                    labelText: "Correo",
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-                SizedBox(height: 20),
-                TextField(
-                  controller: passwordController,
-                  obscureText: true,
-                  decoration: InputDecoration(
-                    labelText: "Contraseña",
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-                SizedBox(height: 30),
-                ElevatedButton(
-                  onPressed: isLoading
-                      ? null
-                      : login, // Deshabilita el botón si está cargando
-                  style: ElevatedButton.styleFrom(
-                    minimumSize: Size(double.infinity, 50),
-                    backgroundColor: Colors.blueAccent,
-                  ),
-                  child: isLoading
-                      ? CircularProgressIndicator(color: Colors.white)
-                      : Text(
-                          "Iniciar Sesión",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20,
-                          ),
+            constraints: BoxConstraints(
+              minHeight:
+                  MediaQuery.of(context).size.height -
+                  kToolbarHeight -
+                  MediaQuery.of(context).padding.top,
+            ),
+            child: IntrinsicHeight(
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(maxWidth: 350),
+                  child: Column(
+                    children: [
+                      SizedBox(height: 40),
+                      CircleAvatar(
+                        radius: 50,
+                        backgroundImage: AssetImage('assets/img/logoAAB.png'),
+                      ),
+                      SizedBox(height: 20),
+                      Text(
+                        "Iniciar Sesión",
+                        style: TextStyle(
+                          fontSize: 35,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.blueAccent,
                         ),
-                ),
-                SizedBox(height: 10),
-                Text(
-                  "¿Olvidaste tu contraseña?",
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.blueAccent,
+                      ),
+                      SizedBox(height: 40),
+                      TextField(
+                        controller: emailController,
+                        decoration: InputDecoration(
+                          labelText: "Correo",
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                      SizedBox(height: 20),
+                      TextField(
+                        controller: passwordController,
+                        obscureText: true,
+                        decoration: InputDecoration(
+                          labelText: "Contraseña",
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                      SizedBox(height: 30),
+                      ElevatedButton(
+                        onPressed: isLoading ? null : login,
+                        style: ElevatedButton.styleFrom(
+                          minimumSize: Size(double.infinity, 50),
+                          backgroundColor: Colors.blueAccent,
+                        ),
+                        child: isLoading
+                            ? CircularProgressIndicator(color: Colors.white)
+                            : Text(
+                                "Iniciar Sesión",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20,
+                                ),
+                              ),
+                      ),
+                      SizedBox(height: 10),
+                      Text(
+                        "¿Olvidaste tu contraseña?",
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.blueAccent,
+                        ),
+                      ),
+                      SizedBox(height: 100),
+                      Text(
+                        "Copyright © 2025 - Barri Boys INC.",
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.blueGrey,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-
-                Spacer(),
-
-                Text(
-                  "Copyright © 2025 - Barri Boys INC.",
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.blueGrey,
-                  ),
-                ),
-              ],
+              ),
             ),
           ),
         ),
