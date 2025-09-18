@@ -12,6 +12,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Adesa',
+      theme: ThemeData(fontFamily: 'adesa'),
       home: Login(),
       routes: {"/home": (_) => HomePage()},
     );

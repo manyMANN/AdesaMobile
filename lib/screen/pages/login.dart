@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:adesa/screen/widgets/bar.dart';
 import 'package:adesa/screen/widgets/base_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -17,6 +16,7 @@ class _LoginState extends State<Login> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   bool isLoading = false;
+  bool isRegister = false;
 
   Future<void> login() async {
     final email = emailController.text.trim();
@@ -24,7 +24,7 @@ class _LoginState extends State<Login> {
 
     if (email.isEmpty || password.isEmpty) {
       if (!mounted) return;
-      showStyledSnackBar(context, "Debes ingresar correo y contraseña");
+      showCustomModalAlert(context, "Debes ingresar correo y contraseña");
       return;
     }
 
@@ -52,9 +52,7 @@ class _LoginState extends State<Login> {
         Navigator.pushReplacementNamed(context, "/home");
       } else if (response.statusCode == 401) {
         if (!mounted) return;
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text("Credenciales inválidas")));
+        showCustomModalAlert(context, "Credenciales inválidas");
       } else {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
@@ -73,6 +71,45 @@ class _LoginState extends State<Login> {
         setState(() => isLoading = false);
       }
     }
+  }
+
+  Future<void> register() async {}
+
+  void showCustomModalAlert(
+    BuildContext context,
+    String message, {
+    Color bgColor = Colors.white,
+    IconData icon = Icons.error,
+  }) {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (_) => Dialog(
+        backgroundColor: Colors.white,
+        insetPadding: EdgeInsets.only(top: 50, left: 40, right: 40),
+        child: Container(
+          padding: EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: bgColor,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.blueAccent, width: 2),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, color: Colors.blueAccent),
+              SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  message,
+                  style: TextStyle(color: Colors.blueAccent),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   void showStyledSnackBar(
@@ -94,7 +131,14 @@ class _LoginState extends State<Login> {
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         duration: Duration(seconds: 3),
-        margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        //margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        margin: EdgeInsets.only(
+          top:
+              MediaQuery.of(context).padding.top +
+              10, // Justo debajo del status bar
+          left: 20,
+          right: 20,
+        ),
       ),
     );
   }
@@ -103,7 +147,7 @@ class _LoginState extends State<Login> {
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      appBar: CustomAppBar(title: "Barri Boy´s"),
+      //appBar: CustomAppBar(title: "Barri Boy´s"),
       body: BaseScreen(
         child: SingleChildScrollView(
           padding: EdgeInsets.all(20),
@@ -120,26 +164,19 @@ class _LoginState extends State<Login> {
                   constraints: BoxConstraints(maxWidth: 350),
                   child: Column(
                     children: [
-                      SizedBox(height: 40),
+                      SizedBox(height: 120),
                       CircleAvatar(
-                        radius: 50,
+                        radius: 40,
                         backgroundImage: AssetImage('assets/img/logoAAB.png'),
                       ),
-                      SizedBox(height: 20),
-                      Text(
-                        "Iniciar Sesión",
-                        style: TextStyle(
-                          fontSize: 35,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.blueAccent,
-                        ),
-                      ),
-                      SizedBox(height: 40),
+                      SizedBox(height: 80),
                       TextField(
                         controller: emailController,
                         decoration: InputDecoration(
                           labelText: "Correo",
-                          border: OutlineInputBorder(),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(15.0),
+                          ),
                         ),
                       ),
                       SizedBox(height: 20),
@@ -148,24 +185,33 @@ class _LoginState extends State<Login> {
                         obscureText: true,
                         decoration: InputDecoration(
                           labelText: "Contraseña",
-                          border: OutlineInputBorder(),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(15.0),
+                          ),
                         ),
                       ),
-                      SizedBox(height: 30),
+                      SizedBox(height: 20),
                       ElevatedButton(
                         onPressed: isLoading ? null : login,
                         style: ElevatedButton.styleFrom(
-                          minimumSize: Size(double.infinity, 50),
+                          minimumSize: Size(double.infinity, 40),
                           backgroundColor: Colors.blueAccent,
                         ),
                         child: isLoading
-                            ? CircularProgressIndicator(color: Colors.white)
+                            ? SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                  strokeWidth: 3, // Grosor del círculo
+                                ),
+                              )
                             : Text(
                                 "Iniciar Sesión",
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.bold,
-                                  fontSize: 20,
+                                  fontSize: 15,
                                 ),
                               ),
                       ),
@@ -173,19 +219,56 @@ class _LoginState extends State<Login> {
                       Text(
                         "¿Olvidaste tu contraseña?",
                         style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.blueAccent,
-                        ),
-                      ),
-                      SizedBox(height: 100),
-                      Text(
-                        "Copyright © 2025 - Barri Boys INC.",
-                        style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w500,
-                          color: Colors.blueGrey,
+                          color: Colors.black,
                         ),
+                      ),
+                      SizedBox(height: 170),
+                      ElevatedButton(
+                        //onPressed: isLoading ? null : login,
+                        onPressed: isRegister ? null : register,
+                        style: ElevatedButton.styleFrom(
+                          minimumSize: Size(double.infinity, 40),
+                          backgroundColor: Colors.white,
+                          side: BorderSide(color: Colors.blueAccent, width: 2),
+                        ),
+                        child: isRegister
+                            ? SizedBox(
+                                width: 24,
+                                height: 24,
+                                child: CircularProgressIndicator(
+                                  color: Colors.blueAccent,
+                                  strokeWidth: 3, // Grosor del círculo
+                                ),
+                              )
+                            : Text(
+                                "Crear cuenta nueva",
+                                style: TextStyle(
+                                  color: Colors.blueAccent,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 15,
+                                ),
+                              ),
+                      ),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Image.asset(
+                            'assets/img/logoAAB.png',
+                            height: 20,
+                            width: 20,
+                          ),
+                          SizedBox(width: 6),
+                          Text(
+                            "Barri Boy´s ©.",
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.blueGrey,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
